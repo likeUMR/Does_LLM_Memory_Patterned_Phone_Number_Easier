@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "which-phone-number-does-llm-mem-better"
+version = "0.1.0"
+description = ""
+authors = ["Li Kehang <2353146641@qq.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.15"
+# CUDA 12.8版本的PyTorch（支持RTX 5070 Ti）
+torch = { version = "2.9.0+cu128", source = "pytorch-cuda" }
+torchvision = { version = "0.24.0+cu128", source = "pytorch-cuda" }
+torchaudio = { version = "2.9.0+cu128", source = "pytorch-cuda" }
+# 其他依赖
+transformers = ">=4.40.0"
+datasets = ">=2.16.0"
+accelerate = ">=0.28.0"
+bitsandbytes = ">=0.43.0"
+matplotlib = ">=3.8.0"
+numpy = ">=1.24.0"
+tqdm = ">=4.66.0"
+peft = ">=0.10.0"
+
+[[tool.poetry.source]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu128"  # 改为cu128
+priority = "explicit"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
