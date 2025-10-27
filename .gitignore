@@ -39,7 +39,7 @@ poetry.lock
 # Data
 data/
 models/
-results/
+# results/  # 允许上传实验结果（loss曲线和统计数据）
 
 # Logs
 *.log

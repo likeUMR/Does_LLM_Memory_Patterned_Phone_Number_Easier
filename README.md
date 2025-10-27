@@ -19,7 +19,7 @@
 数据格式：`第{i}个电话号码是：{xxx}`
 
 ### 2. 模型训练
-- 基础模型：Qwen3-1.7B-FP8
+- 基础模型：Qwen3-1.7B（非FP8版本，Windows兼容）
 - 优化器：Adam-8bit
 - 训练方法：使用LoRA进行参数高效微调
   - LoRA rank: 32（高容量配置）
@@ -29,7 +29,8 @@
 - 学习率：2e-4
 - 训练轮数：10 epochs
 - 批次大小：4（梯度累积4步）
-- 预期显存占用：~9.5GB（16GB显存下）
+- 评估策略：每个epoch结束后评估loss
+- 预期显存占用：~11.5GB（16GB显存下）
 
 ### 3. 结果可视化
 在一张折线图中绘制3条epoch-loss曲线，对比不同模式的训练效果。
@@ -100,9 +101,15 @@ Which_Phone_Number_Does_LLM_mem_Better/
 ├── results/                      # 实验结果
 │   ├── training_losses.json     # 训练loss数据
 │   └── loss_curves.png          # loss曲线图
-├── Qwen3-1___7B-FP8/            # 基础模型目录
+├── Qwen3-1___7B/                # 基础模型目录（需手动下载）
+│   ├── config.json              # 模型配置
+│   ├── model-00001-of-00002.safetensors  # 模型权重文件1
+│   ├── model-00002-of-00002.safetensors  # 模型权重文件2
+│   ├── model.safetensors.index.json      # 权重索引文件
+│   └── tokenizer相关文件
 ├── run_experiment.py             # 主运行脚本
 ├── pyproject.toml               # Poetry配置文件
+├── config.py                    # 统一配置文件
 ├── 实验设计.md                   # 实验设计文档
 └── README.md                    # 本文件
 ```
@@ -118,10 +125,15 @@ Which_Phone_Number_Does_LLM_mem_Better/
 
 ## 注意事项
 
-1. 训练过程可能需要较长时间，请耐心等待
-2. 确保GPU显存充足（至少13GB）
-3. 数据集和模型会占用较多磁盘空间
-4. 请先自行下载模型文件夹中的safetensor文件
+1. **模型下载**：需要手动下载Qwen3-1.7B模型
+   - 访问：https://huggingface.co/Qwen/Qwen3-1.7B
+   - 下载 `model-00001-of-00002.safetensors` 和 `model-00002-of-00002.safetensors`
+   - 下载 `model.safetensors.index.json` 和其他配置文件
+   - 放置到 `Qwen3-1___7B/` 目录
+2. 训练过程可能需要较长时间，请耐心等待
+3. 确保GPU显存充足（至少13GB，推荐16GB）
+4. 数据集和模型会占用较多磁盘空间（模型约3.4GB）
+5. RTX 50系列显卡需要使用PyTorch 2.9.0+cu128版本
 
 ## 许可证
 
