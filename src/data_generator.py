@@ -4,8 +4,13 @@
 
 import random
 import json
+import sys
 from pathlib import Path
 from typing import List, Dict
+
+# 添加项目根目录到路径，以便导入config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import config
 
 
 class PhoneNumberGenerator:
@@ -129,12 +134,11 @@ class PhoneNumberGenerator:
 
 def main():
     """主函数"""
-    generator = PhoneNumberGenerator(num_samples=100)
+    generator = PhoneNumberGenerator(num_samples=config.NUM_SAMPLES)
     datasets = generator.generate_all_datasets()
     
     # 保存到data目录
-    output_dir = Path(__file__).parent.parent / "data"
-    generator.save_datasets(datasets, output_dir)
+    generator.save_datasets(datasets, config.DATA_DIR)
     
     # 打印统计信息
     print("\n数据集统计:")

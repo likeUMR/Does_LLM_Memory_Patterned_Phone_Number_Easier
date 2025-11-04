@@ -3,11 +3,16 @@
 """
 
 import json
+import sys
 from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import numpy as np
 import platform
+
+# 添加项目根目录到路径，以便导入config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import config
 
 # 设置中文字体
 def setup_chinese_font():
@@ -72,17 +77,11 @@ class LossVisualizer:
         if self.data is None:
             self.load_data()
         
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=config.PLOT_CONFIG["figsize"])
         
-        # 定义组名和对应的中文标签
-        group_labels = {
-            'GroupA': '随机号码',
-            'GroupB': '反对称号码',
-            'GroupC': '高度重复号码'
-        }
-        
-        # 定义颜色
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+        # 使用配置中的组标签和颜色
+        group_labels = config.GROUP_LABELS
+        colors = config.PLOT_CONFIG["colors"]
         
         # 绘制每个组的loss曲线
         for idx, group_data in enumerate(self.data):
@@ -117,7 +116,7 @@ class LossVisualizer:
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.savefig(output_path, dpi=config.PLOT_CONFIG["dpi"], bbox_inches='tight')
         print(f"Loss曲线已保存到: {output_path}")
         
         # 关闭图形，避免阻塞程序
@@ -151,8 +150,7 @@ class LossVisualizer:
 
 def main():
     """主函数"""
-    results_dir = Path(__file__).parent.parent / "results"
-    loss_file = results_dir / "training_losses.json"
+    loss_file = config.RESULTS_DIR / "training_losses.json"
     
     if not loss_file.exists():
         print(f"错误: 找不到loss文件 {loss_file}")

@@ -16,8 +16,8 @@ NUM_SAMPLES = 100  # 每个组生成的电话号码数量
 
 # 训练配置
 TRAINING_CONFIG = {
-    "learning_rate": 2e-4,
-    "num_epochs": 10,
+    "learning_rate": 1e-4,
+    "num_epochs": 30,
     "batch_size": 4,
     "gradient_accumulation_steps": 4,
     "max_length": 128,

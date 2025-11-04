@@ -4,6 +4,7 @@
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Dict, List
 import torch
@@ -17,6 +18,10 @@ from transformers import (
 )
 from peft import LoraConfig, get_peft_model, TaskType
 import numpy as np
+
+# 添加项目根目录到路径，以便导入config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import config
 
 
 class PhoneNumberDataset(Dataset):
@@ -107,13 +112,10 @@ class SSTrainer:
         # 增加rank以提升模型表达能力，扩展到FFN层以覆盖更多参数
         self.lora_config = LoraConfig(
             task_type=TaskType.CAUSAL_LM,
-            r=32,  # 从8增加到32，参数容量提升给16倍
-            lora_alpha=64,  # alpha = 2 * r，保持良好训练稳定性
-            lora_dropout=0.1,
-            target_modules=[
-                "q_proj", "k_proj", "v_proj", "o_proj",  # Attention层
-                "gate_proj", "up_proj", "down_proj"       # FFN层（新增）
-            ]
+            r=config.TRAINING_CONFIG["lora_r"],
+            lora_alpha=config.TRAINING_CONFIG["lora_alpha"],
+            lora_dropout=config.TRAINING_CONFIG["lora_dropout"],
+            target_modules=config.LORA_TARGET_MODULES
         )
         
         # 用于记录loss
@@ -167,7 +169,7 @@ class SSTrainer:
             per_device_train_batch_size=self.batch_size,
             gradient_accumulation_steps=self.gradient_accumulation_steps,
             learning_rate=self.lr,
-            fp16=True,
+            fp16=config.TRAINING_CONFIG["fp16"],
             logging_steps=10,
             save_strategy="epoch",
             save_total_limit=2,
@@ -273,38 +275,33 @@ class SSTrainer:
 
 def main():
     """主函数"""
-    # 配置路径
-    model_path = Path(__file__).parent.parent / "Qwen3-1___7B"  # 使用非FP8版本
-    dataset_dir = Path(__file__).parent.parent / "data"
-    models_dir = Path(__file__).parent.parent / "models"
-    results_dir = Path(__file__).parent.parent / "results"
-    
     # 检查模型路径
-    if not model_path.exists():
-        print(f"错误: 找不到模型路径 {model_path}")
+    if not config.MODEL_DIR.exists():
+        print(f"错误: 找不到模型路径 {config.MODEL_DIR}")
         return
     
     # 检查数据集
-    if not dataset_dir.exists():
-        print(f"错误: 找不到数据集目录 {dataset_dir}")
+    if not config.DATA_DIR.exists():
+        print(f"错误: 找不到数据集目录 {config.DATA_DIR}")
         print("请先运行 data_generator.py 生成数据集")
         return
     
     # 创建训练器
     trainer = SSTrainer(
-        model_path=str(model_path),
-        output_dir=str(models_dir),
-        lr=2e-4,
-        epochs=10,
-        batch_size=4,
-        gradient_accumulation_steps=4
+        model_path=str(config.MODEL_DIR),
+        output_dir=str(config.MODELS_DIR),
+        lr=config.TRAINING_CONFIG["learning_rate"],
+        epochs=config.TRAINING_CONFIG["num_epochs"],
+        batch_size=config.TRAINING_CONFIG["batch_size"],
+        gradient_accumulation_steps=config.TRAINING_CONFIG["gradient_accumulation_steps"],
+        max_length=config.TRAINING_CONFIG["max_length"]
     )
     
     # 训练所有组
-    trainer.train_all_groups(str(dataset_dir))
+    trainer.train_all_groups(str(config.DATA_DIR))
     
     # 保存loss
-    trainer.save_losses(str(results_dir / "training_losses.json"))
+    trainer.save_losses(str(config.RESULTS_DIR / "training_losses.json"))
 
 
 if __name__ == "__main__":
