@@ -129,11 +129,6 @@ Which_Phone_Number_Does_LLM_mem_Better/
 
 ![训练Loss对比曲线](results/loss_curves.png)
 
-从图中可以观察到：
-- **高度重复号码（GroupC）**：loss最低，学习效果最好，说明模型更容易记忆有规律的数据
-- **反对称号码（GroupB）**：loss居中，学习效果中等
-- **随机号码（GroupA）**：loss最高，学习效果最差，说明模型对无规律数据的记忆能力较弱
-
 ## 注意事项
 
 1. **模型下载**：需要手动下载Qwen3-1.7B模型

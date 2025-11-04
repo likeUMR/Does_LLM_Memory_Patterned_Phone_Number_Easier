@@ -12,7 +12,7 @@ MODELS_DIR = BASE_DIR / "models"
 RESULTS_DIR = BASE_DIR / "results"
 
 # 数据生成配置
-NUM_SAMPLES = 100  # 每个组生成的电话号码数量
+NUM_SAMPLES = 500  # 每个组生成的电话号码数量
 
 # 训练配置
 TRAINING_CONFIG = {
